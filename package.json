@@ -1,0 +1,40 @@
+{
+  "name": "unihire",
+  "version": "1.0.0",
+  "description": "unihire-assignment",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/udhaymanhas/demo-uh.git"
+  },
+  "author": "Udhay Singh Manhas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/udhaymanhas/demo-uh/issues"
+  },
+  "homepage": "https://github.com/udhaymanhas/demo-uh#readme",
+  "dependencies": {
+    "angular": "^1.5.8",
+    "angular-xeditable": "^0.2.0",
+    "body-parser": "^1.15.2",
+    "bootstrap": "^3.3.7",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.14.0",
+    "express-session": "^1.14.0",
+    "jquery": "^3.1.0",
+    "mongod": "^1.3.0",
+    "mongodb": "^2.2.5",
+    "mongoose": "^4.5.8",
+    "mongoose-auto-increment": "^5.0.1",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^4.0.0"
+  },
+  "engines": {
+    "node": "6.2.0"
+  }
+}

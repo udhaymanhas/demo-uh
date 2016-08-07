@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="UniHire">
+<head>
+    <meta charset="UTF-8">
+    <title>#</title>
+    <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/css/modal.css" rel="stylesheet" type="text/css">
+    <link href="/css/index.css" rel="stylesheet" type="text/css">
+
+</head>
+<body style="display:none" ng-controller="mainController">
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">UniHire</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a ng-show="!loggedIn" data-toggle="modal" data-target="#login-modal" ><span style="cursor:pointer">Login/Register</span></a></li>
+                <li><a href ng-click="logout()" ng-if="logged_in">Logout</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div id="cover" >
+    <div class="sub-c"><div class=" loader"></div></div>
+</div>
+
+<div class="container" ng-controller="displayStudent">
+    <div class="row">
+        <div class="col-md-12" style="color:{{color}}">
+            <h2 ng-if="loggedIn" >Hello <b>{{student.name}}</b></h2>
+            <h3 ng-if="loggedIn && studentDet" >Your are from <b>{{student.collegeName}}</b> and pursuing <b>{{student.degreeName}}</b> <a ng-show="loggedIn" data-toggle="modal" data-target="#college-modal" > <span style="cursor:pointer;font-size: 17px;" title="Update College Details"> &nbsp&nbsp&nbsp<span  class="glyphicon glyphicon-pencil"></span></span></a></h3>
+            <br>
+
+        </div>
+        <div class="col-md-2">
+            <span ng-if="loggedIn && studentDet" style="cursor:pointer;font-size: 28px;"><span title="Change Color" ng-click="changeColor()" class="glyphicon glyphicon-adjust"></span></span>
+        </div>
+    </div>
+</div>
+
+
+<div ng-if="!loggedIn" class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" align="center">
+                <img class="img-circle" id="img_logo" src="img/man.png">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+            </div>
+
+            <!-- Begin # DIV Form -->
+            <div id="div-forms">
+
+                <!-- Begin # Login Form -->
+                <form id="login-form" ng-controller="loginForm">
+                    <div class="modal-body">
+                        <div id="div-login-msg">
+                            <div id="icon-login-msg" class="glyphicon glyphicon-chevron-right"></div>
+                            <span id="text-login-msg">Type your username and password.</span>
+                        </div>
+                        <input id="login_username" ng-model="user.username" class="form-control" type="email" placeholder="E-Mail" required>
+                        <input id="login_password" ng-model="user.password" class="form-control" type="password" placeholder="Password" required>
+                        <!--<div class="checkbox">-->
+                            <!--<label>-->
+                                <!--<input type="checkbox"> Remember me-->
+                            <!--</label>-->
+                        <!--</div>-->
+                    </div>
+                    <div class="modal-footer">
+                        <div>
+                            <button type="submit" ng-click="login(user)" class="btn btn-primary btn-lg btn-block">Login</button>
+                        </div>
+                        <div>
+                            <!--<button id="login_lost_btn" type="button" class="btn btn-link">Lost Password?</button>-->
+                            <button id="login_register_btn" type="button" class="btn btn-link">Register!</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- End # Login Form -->
+
+                <!-- Begin | Register Form -->
+                <form id="register-form" style="display:none;" ng-controller="registerForm">
+                    <div class="modal-body">
+                        <div id="div-register-msg">
+                            <div id="icon-register-msg" class="glyphicon glyphicon-chevron-right"></div>
+                            <span id="text-register-msg">Register</span>
+                        </div>
+                        <input id="register_firstname" ng-model="$parent.user.firstName" class="form-control" type="text" placeholder="First Name" required>
+                        <input id="register_lastname" ng-model="$parent.user.lastName" class="form-control" type="text" placeholder="Last Name" >
+                        <input id="register_email" ng-model="$parent.user.email" class="form-control" type="email" placeholder="E-Mail" required>
+                        <input id="register_password" ng-model="$parent.user.password" class="form-control" type="password" placeholder="Password" required>
+                        <input id="register_passwordConfirm" ng-model="$parent.user.passwordConfirm" class="form-control" type="password" placeholder="Confirm password" required>
+                    </div>
+                    <div class="modal-footer">
+                        <div>
+                            <button type="submit" ng-click="register(user)" class="btn btn-primary btn-lg btn-block">Register</button>
+                        </div>
+                        <div>
+                            <button id="register_login_btn" type="button" class="btn btn-link">Log In!</button>
+                            <!--<button id="register_lost_btn" type="button" class="btn btn-link">Lost Password?</button>-->
+                        </div>
+                    </div>
+                </form>
+                <!-- End | Register Form -->
+
+            </div>
+            <!-- End # DIV Form -->
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="college-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" align="center">
+                <img class="img-circle" id="img_logo" src="img/degree.png">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+            </div>
+
+            <!-- Begin # DIV Form -->
+            <div id="div-forms">
+
+                <form id="college-form"  ng-controller="collegeForm">
+                    <div class="modal-body">
+                        <div id="div-register-msg">
+                            <div id="icon-register-msg" class="glyphicon glyphicon-chevron-right"></div>
+                            <span id="text-register-msg">Update College Details</span>
+                        </div>
+
+                        <select class="form-control" ng-model="selectCollege" ng-change="setDegree(selectCollege)" required>
+                            <option value="{{$index}}"  ng-repeat="college in collegeData">{{college.name}}</option>
+                        </select>
+
+                        <select class="form-control" ng-model="collegeDegree" required>
+                            <option value="{{degree}}"  ng-repeat="degree in degrees track by $index">{{degree}}</option>
+                        </select>
+
+                    </div>
+                    <div class="modal-footer">
+                        <div>
+                            <button type="submit" ng-click="updateCollege(selectCollege,collegeDegree)" class="btn btn-primary btn-lg btn-block">Update College</button>
+                        </div>
+
+                    </div>
+                </form>
+                <!-- End | Register Form -->
+
+            </div>
+            <!-- End # DIV Form -->
+
+        </div>
+    </div>
+</div>
+
+</body>
+
+<script src="/jquery/dist/jquery.min.js"></script>
+<script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+<!--<script src="/js/modal.js"></script>-->
+<script src="/angular/angular.min.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/custom.js"></script>
+
+</html>

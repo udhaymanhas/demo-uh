@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="UniHireAdmin">
+<head>
+    <meta charset="UTF-8">
+    <title>#</title>
+    <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/angular-xeditable/dist/css/xeditable.min.css" rel="stylesheet" type="text/css">
+    <link href="/css/modal.css" rel="stylesheet" type="text/css">
+    <link href="/css/index.css" rel="stylesheet" type="text/css">
+
+</head>
+<body style="display:none" ng-controller="mainController">
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">UniHire-AdminPanel</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a ng-show="!loggedIn" data-toggle="modal" data-target="#admin-login-modal" ><span style="cursor:pointer">Login</span></a></li>
+                <li><a ng-show="loggedIn" >{{username}}</a></li>
+                <!--<li><a href ng-click="logout()" ng-if="logged_in">Logout</a></li>-->
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div id="cover" >
+    <div class="sub-c"><div class=" loader"></div></div>
+</div>
+
+<div class="container" ng-controller="displayPanel">
+    <div class="row" ng-if="loggedIn">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs">
+                <li ng-class="{active:currentTab(1)}">
+                    <a href ng-click="setTab(1)" title="Student Panel"><span class="glyphicon glyphicon-user"></span> Students</a>
+                </li>
+                <li ng-class="{active:currentTab(2)}">
+                    <a href ng-click="setTab(2)" title="College Panel"><span class="glyphicon glyphicon-hdd"></span> College Data</a>
+                </li>
+            </ul>
+            <div class="panel panel-default" ng-show="currentTab(1)">
+                <!-- Default panel contents -->
+                <!--<div class="panel-heading">Students</div>-->
+                <!--<div class="panel-body">-->
+                <!--</div>-->
+
+                <!-- Table -->
+                <table class="table">
+                    <tr>
+                        <th>username</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>College </th>
+                        <th>Degree </th>
+                    </tr>
+                    <tr ng-repeat="user in users">
+                        <td>{{user.username}}</td>
+                        <td>{{user.firstName}}</td>
+                        <td>{{user.lastName}}</td>
+                        <td>{{user.collegeName}}</td>
+                        <td>{{user.collegeDegree}}</td>
+                    </tr>
+
+                </table>
+            </div>
+            <div style="padding:10px;" class="panel panel-default" ng-show="currentTab(2)">
+
+                <ul class="nav nav-tabs">
+                    <li ng-class="{active:currentSubTab(1)}">
+                        <a href ng-click="setSubTab(1)" title="Student Panel"><span class="glyphicon glyphicon-list-alt"></span> Data</a>
+                    </li>
+                    <li ng-class="{active:currentSubTab(2)}">
+                        <a href ng-click="setSubTab(2)" title="College Panel"><span class="glyphicon glyphicon-plus"></span> Add New</a>
+                    </li>
+                </ul>
+                <div class="panel panel-default" ng-show="currentSubTab(1)">
+                    <table class="table">
+                        <tr>
+                            <th style="width:35%" >College</th>
+                            <th style="width:35%" >Degree</th>
+                            <th style="width:30%" ><span class="glyphicon glyphicon-cog"></span></th>
+                        </tr>
+                        <tr ng-repeat="college in colleges">
+                            <td ><span editable-textarea="college.name" e-name="name" e-form="rowform"  >{{college.name}}</span></td>
+                            <td ><span editable-textarea="college.degree" e-name="degree" e-form="rowform" >{{college.degree}}</span></td>
+                            <td>
+                                <!-- form -->
+                                <form editable-form name="rowform" onbeforesave="saveCollege($data, college._id)" ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == user">
+                                    <button title="Save Changes" type="submit" ng-disabled="rowform.$waiting" class="btn btn-primary">
+                                        <span  class="glyphicon glyphicon-floppy-save"></span>
+                                    </button>
+                                    <button title="Close" type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()" class="btn btn-default">
+                                        <span  class="glyphicon glyphicon-remove"></span>
+                                    </button>
+                                </form>
+                                <div class="buttons" ng-show="!rowform.$visible">
+                                    <button title="Edit" class="btn btn-primary" ng-click="rowform.$show()">
+                                        <span  class="glyphicon glyphicon-pencil"></span>
+                                    </button>
+                                    <button title="Delete" class=" btn btn-danger " ng-click="delCollege(college._id, $index)">
+                                        <span  class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+                <div class="panel panel-default" ng-show="currentSubTab(2)">
+                    <form>
+                        <table class="table">
+                            <tr>
+                                <th>College Name</th>
+                                <th>Degree Name</th>
+                            </tr>
+                            <tr >
+                                <td><input type="text" ng-model="college.name"></td>
+                                <td><textarea rows="1" col="70" type="text" ng-model="college.degree" placeholder="comma separated values"></textarea></td>
+                                <!--<td><textarea rows="1" col="70" type="text" ng-model="college.degreeType"></textarea></td>-->
+                                <!--<td><textarea rows="1" col="70" type="text" ng-model="college.degreeName"></textarea></td>-->
+                                <td>
+                                    <button type="submit" ng-click="addCollege(college)" class="btn btn-primary btn-block">Add</button>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div  class="modal fade" id="admin-login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" align="center">
+                <img class="img-circle" id="img_logo" src="img/man.png">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+            </div>
+
+            <!-- Begin # DIV Form -->
+            <div id="div-forms">
+
+                <!-- Begin # Login Form -->
+                <form id="login-form" ng-controller="loginForm">
+                    <div class="modal-body">
+                        <div id="div-login-msg">
+                            <div id="icon-login-msg" class="glyphicon glyphicon-chevron-right"></div>
+                            <span id="text-login-msg">Type your username and password.</span>
+                        </div>
+                        <input id="login_username" ng-model="admin.username" class="form-control" type="text" placeholder="username" required>
+                        <input id="login_password" ng-model="admin.password" class="form-control" type="password" placeholder="Password" required>
+                        <!--<div class="checkbox">-->
+                            <!--<label>-->
+                                <!--<input type="checkbox"> Remember me-->
+                            <!--</label>-->
+                        <!--</div>-->
+                    </div>
+                    <div class="modal-footer">
+                        <div>
+                            <button type="submit" ng-click="login(admin)" class="btn btn-primary btn-lg btn-block">Login</button>
+                        </div>
+                        <div>
+                            <!--<button id="login_lost_btn" type="button" class="btn btn-link">Lost Password?</button>-->
+                            <!--<button id="login_register_btn" type="button" class="btn btn-link">Register</button>-->
+                        </div>
+                    </div>
+                </form>
+                <!-- End # Login Form -->
+
+            </div>
+            <!-- End # DIV Form -->
+
+        </div>
+    </div>
+</div>
+
+
+</body>
+
+<script src="/jquery/dist/jquery.min.js"></script>
+<script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+<!--<script src="/js/modal.js"></script>-->
+<script src="/angular/angular.min.js"></script>
+<script src="/angular-xeditable/dist/js/xeditable.min.js"></script>
+<script src="/js/adminApp.js"></script>
+<script src="/js/custom.js"></script>
+
+</html>
