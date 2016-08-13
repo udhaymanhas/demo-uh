@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="UniHire">
+<html lang="en" ng-app="UniHire" >
 <head>
     <meta charset="UTF-8">
     <title>#</title>
@@ -7,8 +7,10 @@
     <link href="/css/modal.css" rel="stylesheet" type="text/css">
     <link href="/css/index.css" rel="stylesheet" type="text/css">
 
+    <link href="/angular-mass-autocomplete/massautocomplete.theme.css" rel="stylesheet" type="text/css">
+
 </head>
-<body style="display:none" ng-controller="mainController">
+<body style="display:none" ng-controller="mainController" ng-init="student = {'name':'xx','collegeName':'xxx','degreeName':'xxxxx'}" >
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -26,7 +28,7 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
                 <li><a ng-show="!loggedIn" data-toggle="modal" data-target="#login-modal" ><span style="cursor:pointer">Login/Register</span></a></li>
-                <li><a href ng-click="logout()" ng-if="logged_in">Logout</a></li>
+                <li><a href ng-click="logout()" ng-if="loggedIn">Logout</a></li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
@@ -137,23 +139,28 @@
 
                 <form id="college-form"  ng-controller="collegeForm">
                     <div class="modal-body">
-                        <div id="div-register-msg">
-                            <div id="icon-register-msg" class="glyphicon glyphicon-chevron-right"></div>
-                            <span id="text-register-msg">Update College Details</span>
+                        <div id="div-college-modal-msg">
+                            <div id="icon-college-modal-msg" class="glyphicon glyphicon-chevron-right"></div>
+                            <span id="text-college-modal-msg">Update College Details</span>
+                        </div><br>
+                        <div mass-autocomplete >
+                            <input class="c form-control" ng-model="selectCollege" placeholder="Enter College name" mass-autocomplete-item="autocomplete_college">
                         </div>
+                        <div mass-autocomplete >
+                            <input class="d form-control" ng-model="selectDegree" placeholder="Enter Degree" mass-autocomplete-item="autocomplete_degree">
+                        </div>
+                            <!--<select class="form-control" ng-model="selectCollege" ng-change="setDegree(selectCollege)" required>-->
+                                <!--<option value="{{$index}}"  ng-repeat="college in collegeData">{{college.name}}</option>-->
+                            <!--</select>-->
 
-                        <select class="form-control" ng-model="selectCollege" ng-change="setDegree(selectCollege)" required>
-                            <option value="{{$index}}"  ng-repeat="college in collegeData">{{college.name}}</option>
-                        </select>
-
-                        <select class="form-control" ng-model="collegeDegree" required>
-                            <option value="{{degree}}"  ng-repeat="degree in degrees track by $index">{{degree}}</option>
-                        </select>
+                        <!--<select class="form-control" ng-model="collegeDegree" required>-->
+                            <!--<option value="{{degree}}"  ng-repeat="degree in degrees track by $index">{{degree}}</option>-->
+                        <!--</select>-->
 
                     </div>
                     <div class="modal-footer">
                         <div>
-                            <button type="submit" ng-click="updateCollege(selectCollege,collegeDegree)" class="btn btn-primary btn-lg btn-block">Update College</button>
+                            <button type="submit" ng-click="updateCollege()" class="btn btn-primary btn-lg btn-block">Update College</button>
                         </div>
 
                     </div>
@@ -169,10 +176,16 @@
 
 </body>
 
+
+
 <script src="/jquery/dist/jquery.min.js"></script>
 <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
 <!--<script src="/js/modal.js"></script>-->
 <script src="/angular/angular.min.js"></script>
+<script src="/angular-sanitize/angular-sanitize.min.js"></script>
+<script src="https://rawgithub.com/hakib/MassAutocomplete/master/massautocomplete.js"></script>
+<!--<script src="/angular-mass-autocomplete/massautocomplete.js"></script>-->
+<!--<script src="/fuse/lib/fuse.js"></script>-->
 <script src="/js/app.js"></script>
 <script src="/js/custom.js"></script>
 

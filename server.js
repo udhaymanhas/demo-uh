@@ -9,8 +9,8 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var bodyParser = require('body-parser');
 //var LocalStrategy = require('passport-local').Strategy;
-//var cookieParser = require('cookie-parser');
-//var session = require('express-session');
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
 //var User = require('./server/models/users');
 var app = express();
 
@@ -20,10 +20,14 @@ mongoose.connect('mongodb://udhaymanhas:qwertyuiop@ds145325.mlab.com:45325/db-un
 app.use('/', express.static(process.cwd() + '/public'));
 app.use('/jquery', express.static(process.cwd() + '/node_modules/jquery'));
 app.use('/angular', express.static(process.cwd() + '/node_modules/angular'));
+app.use('/angular-sanitize', express.static(process.cwd() + '/node_modules/angular-sanitize'));
 app.use('/angular-xeditable', express.static(process.cwd() + '/node_modules/angular-xeditable'));
+app.use('/angular-mass-autocomplete', express.static(process.cwd() + '/node_modules/angular-mass-autocomplete'));
+app.use('/fuse', express.static(process.cwd() + '/node_modules/fuse'));
 app.use('/bootstrap', express.static(process.cwd() + '/node_modules/bootstrap'));
 
-
+app.use(cookieParser());
+app.use(session({secret: 'ssshhhhh',resave: true, cookie:{maxAge:180000}}));
 //app.use(session({
 //    secret: 'unihire',
 //    resave: false,

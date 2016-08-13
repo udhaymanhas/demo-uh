@@ -2,7 +2,13 @@
  * Created by UdHaY on 05-Aug-16.
  */
 //$('body').show();
-var app = angular.module("UniHire", []);
+//var Fuse = require('/fuse/lib/fuse.js');
+//var fuzzySearch = new Fuse(states, {
+//    shouldSort: true,
+//    caseSensitive: false,
+//    threshold: 0.4
+//});
+var app = angular.module("UniHire", ['ngSanitize', 'MassAutoComplete']);
 
 app.controller("displayStudent", function($scope) {
     $scope.color="#283593";
@@ -29,6 +35,7 @@ app.controller("loginForm", function($scope, $http) {
                     $('#login-modal').modal('toggle');
                     $('.modal-backdrop').hide();
                     $scope.$parent.loggedIn = true;
+                    //console.log(data);
                     $scope.$parent.setData(data);
                     $scope.$parent.setloggedIn();
                 }
@@ -67,7 +74,7 @@ app.controller("registerForm", function($scope,$http) {
 
 });
 
-app.controller("collegeForm", function($scope,$http) {
+app.controller("collegeForm", function($scope,$http,  $sce, $q) {
 
     $scope.collegeData = {};
     $scope.degrees = {};
@@ -76,46 +83,161 @@ app.controller("collegeForm", function($scope,$http) {
     $http.get('/api/data/colleges')
         .success(function(data){
             $scope.collegeData = data;
+            //$scope.autocomplete_options = {
+            //    suggest: suggest_college
+            //};
         });
 
-    $scope.setDegree = function(index){
-        console.log('setting deg');
-        $scope.degrees = $scope.collegeData[index].degree.split(',');
-        console.log($scope.collegeData[index].degree.split(','));
-        console.log(JSON.stringify($scope.collegeData[index].degree.split(',')));
-    };
-
-    $scope.updateCollege = function(collegeNameId,degree){
-        var studentId = $scope.student._id;
-        var collegeNameSelected = $scope.collegeData[collegeNameId].name;
-        var collegeDegreeSelected = degree;
-
-        $http.post('/api/data/colleges/updateStudentCollege', {"_id":studentId,"collegeName":collegeNameSelected,"collegeDegree":collegeDegreeSelected})
-            .success(function(res){
-                if(res = "success"){
-                    $scope.$parent.student.collegeName = collegeNameSelected;
-                    $scope.$parent.student.degreeName = collegeDegreeSelected;
-                    $scope.$parent.studentDet = true;
-                    $('#college-modal').modal('toggle');
-                }
-                else{
-
-                }
-            });
-
+    $scope.setDegree = function(){
+        console.log('setDegree Fired');
+        for (var i = 0; i < $scope.collegeData.length && results.length < 10; i++) {
+            if($scope.collegeData[i].name === $scope.selectCollege){
+                $scope.degrees = $scope.collegeData[i].degree.split(',');
+                console.log($scope.degrees);
+                return true;
+            }
+        }
+        //console.log('setting deg');
+        //$scope.degrees = $scope.collegeData[index].degree.split(',');
+        //console.log($scope.collegeData[index].degree.split(','));
+        //console.log(JSON.stringify($scope.collegeData[index].degree.split(',')));
 
     };
+
+    $scope.updateCollege = function(){
+            //console.log($scope.selectCollege);
+            //console.log($scope.selectDegree);
+            //console.log($('.c').value );
+            //console.log($('.d').value);
+        if(typeof($scope.selectDegree) === 'undefined' || typeof($scope.selectCollege) === 'undefined' ){
+            $scope.msgChange($('#div-college-modal-msg'), $('#icon-college-modal-msg'), $('#text-college-modal-msg'), "error", "glyphicon-remove", "Update error");
+        }
+        else{
+            var studentId = $scope.student._id;
+            //var collegeNameSelected = $scope.collegeData[collegeNameId].name;
+            //var collegeDegreeSelected = degree;
+
+            $http.post('/api/data/colleges/updateStudentCollege', {"_id":studentId,"collegeName":$scope.selectCollege,"collegeDegree":$scope.selectDegree})
+                .success(function(res){
+                    if(res = "success"){
+                        $scope.$parent.student.collegeName = $scope.selectCollege;
+                        $scope.$parent.student.degreeName = $scope.selectDegree;
+                        $scope.$parent.studentDet = true;
+                        $('#college-modal').modal('toggle');
+                    }
+                    else{
+
+                    }
+                });
+//------------------------------------------------------------------------------
+
+        }
+
+
+
+
+    };
+
+
+    function suggest_college(term) {
+        $scope.selectCollege = undefined;
+        $scope.selectDegree = undefined;
+        var q = term.toLowerCase().trim();
+        //console.log(q);
+        var results = [];
+
+        for (var i = 0; i < $scope.collegeData.length && results.length < 10; i++) {
+            var college = $scope.collegeData[i].name;
+            var l_college = college.toLowerCase();
+
+            if (l_college.indexOf(q) >= 0){
+                results.push({ label: college, value: college });
+            }
+
+        }
+        if(results.length == 0) {
+            //results.push({ label: "**Not Found**", value: 'na' });
+            return results;
+        }
+        else{
+            return results;
+        }
+
+    }
+
+
+    $scope.autocomplete_college = {
+        suggest: suggest_college,
+        on_select: function (selected) {
+
+            $scope.selectCollege = selected.label;
+            for (var i = 0; i < $scope.collegeData.length ; i++) {
+                if($scope.collegeData[i].name === selected.label){
+                    $scope.degrees = $scope.collegeData[i].degree.split(',');
+                    //console.log($scope.degrees);
+                    //return true;
+                }
+            }
+        }
+    };
+
+
+    function suggest_degree(term) {
+        $scope.selectDegree = undefined;
+        var q = term.toLowerCase().trim();
+        //console.log(q);
+        var results = [];
+
+        //console.log($scope.degrees);
+        for (var i = 0; i < $scope.degrees.length && results.length < 10; i++) {
+            var degree = $scope.degrees[i];
+            var l_degree = degree.toLowerCase();
+
+            if (l_degree.indexOf(q) >= 0){
+                results.push({ label: degree, value: degree });
+            }
+
+        }
+
+        return results;
+    }
+
+    $scope.autocomplete_degree = {
+        suggest: suggest_degree,
+        on_select: function (selected) {
+            $scope.selectDegree = selected.label;
+        }
+    };
+
 });
 
-app.controller("mainController",function($scope){
+app.controller("mainController",function($scope, $http, $window){
+
+    //console.log('****LOGGED IN USER******');
+    //console.log($scope.logged_in_user);
     $scope.user = {};
     $scope.loggedIn = false;
     $scope.studentDet = false;
     $scope.student = {
-        "name":"",
-        "collegeName":"",
-        "degreeName":""
+        "name":"xx",
+        "collegeName":"xxx",
+        "degreeName":"xxxxx"
     };
+
+    $http.get('/confirm-login')
+        .success(function (user) {
+            //console.log('<--------------------------RUN----------------->');
+            //console.log(user);
+            if(typeof(user.name) == 'undefined' || typeof(user.collegeName) == 'undefined' || typeof(user.degreeName) == 'undefined'){
+                //console.log('NO-SESSION');
+            }
+            else{
+                //console.log('Found-SESSION');
+                $scope.setData(user);
+                $scope.setloggedIn();
+            }
+
+        });
 
     $scope.setloggedIn = function(){
         $scope.loggedIn = true;
@@ -129,7 +251,7 @@ app.controller("mainController",function($scope){
         if(typeof($scope.student.collegeName) != 'undefined' || typeof($scope.student.degreeName) != 'undefined')
             $scope.studentDet = true;
         else{
-            console.log('enter college data');
+            //console.log('enter college data');
             $('#college-modal').modal('toggle');
         }
     };
@@ -164,7 +286,7 @@ app.controller("mainController",function($scope){
         $scope.msgFade($textTag, $msgText);
         $divTag.addClass($divClass);
         $iconTag.removeClass("glyphicon-chevron-right");
-        console.log($iconClass + " " + $divClass);
+        //console.log($iconClass + " " + $divClass);
         $iconTag.addClass($iconClass + " " + $divClass);
         setTimeout(function() {
             $scope.msgFade($textTag, $msgOld);
@@ -174,5 +296,14 @@ app.controller("mainController",function($scope){
         }, $scope.$msgShowTime);
     }
 
+    $scope.logout = function(){
+        $http.get('/user/logout')
+            .success(function(x){
+                if(x.logout === 'success')
+                    $window.location.reload();
+            })
+    };
 
 });
+
+
